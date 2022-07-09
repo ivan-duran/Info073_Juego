@@ -370,8 +370,8 @@ def main():
 
         if dado == 0:
             la_cosa = player_rect 
-            player_cosa = player_font.render("Eres la cosa",0 ,(0, 0, 0))
-            screen.blit(player_cosa,(50, 0))
+            player_text = player_font.render("Eres la cosa",0 ,(0, 0, 0))
+            screen.blit(player_text,(50, 0))
 
         elif dado == 1:
             la_cosa = bot_1_rect
