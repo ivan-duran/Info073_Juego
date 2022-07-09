@@ -9,22 +9,25 @@ import pygame, sys, random
                 
 # Aparicion Obstaculos y pociones
 
-def valida_potions(x, y, potions_list):
+def valida_potions(x, y, potions_list, potions_hit):
     
     for i in range (len(potions_list)):
 
         # si colisiona 
         if potions_list[i][0]//30 == x//30 and potions_list[i][1]//30 == y//30:
-            potions_list[i] = (-100, -100)
+            potions_hit += 1
+            potions_list[i] = (0, 0)
             
-            print(potions_list)
-            return (potions_list)
+            
+    return (potions_list, potions_hit)
+
+
         
 
-    
+     
 
 def valida_obstacle(x, y, obstacle_list):
-    validacion = 0
+    validacion=0
     for i in range (len(obstacle_list)):
 
         # si colisiona 
@@ -74,7 +77,7 @@ def bot_spawn(table):
     return[bot_x, bot_y]
 
 # Movimiento de las computadoras
-def bot_move(table, bot_x, bot_y, bot_speed, bot_width):
+def bot_move(table, bot_x, bot_y, bot_speed, bot_width, obstacle_list):
 
     loop = True    
     while loop:
@@ -83,23 +86,36 @@ def bot_move(table, bot_x, bot_y, bot_speed, bot_width):
             if random.uniform(0, 1) <= 0.5:
                 #derecha
                 if table[(bot_y)//30] [(bot_x + bot_width) //30]!= 0 and table[(bot_y + bot_width)//30] [(bot_x + bot_width) //30]!= 0 and bot_x + 20 + bot_speed < 600 :      
-                    bot_x += bot_speed                   
+
+                            
+                    if valida_obstacle(bot_x + bot_width + bot_speed, bot_y , obstacle_list) and valida_obstacle(bot_x + bot_width, bot_y + bot_width, obstacle_list):
+                             bot_x += bot_speed
+            
             else:
                 #Izquierda
                 if table[(bot_y)//30] [(bot_x - bot_speed) //30]!= 0 and table[(bot_y + bot_width)//30] [(bot_x - bot_speed) //30]!= 0 and (bot_x - bot_speed) > 0:                                                          
-                    bot_x  -= bot_speed
+                   
+
+                    if valida_obstacle(bot_x - bot_speed, bot_y, obstacle_list) and valida_obstacle(bot_x - bot_speed, bot_y + bot_width, obstacle_list) :
+                            bot_x  -= bot_speed
+                    
 
         else:
             #Verticalmente
             if random.uniform(0, 1) <= 0.5:
                 #Arriba
                 if table[(bot_y - bot_speed)//30] [(bot_x) //30]!= 0 and table[(bot_y - bot_speed)//30] [(bot_x + bot_width) //30]!= 0 and bot_y - bot_speed > 0:                                                        
-                    bot_y  -= bot_speed
                     
+
+                    if valida_obstacle(bot_x, bot_y - bot_speed, obstacle_list) and valida_obstacle(bot_x + bot_width, bot_y - bot_speed, obstacle_list) :
+                            bot_y  -= bot_speed                    
             else:
                 #Abajo
                 if table[(bot_y + bot_width)//30] [(bot_x) //30]!= 0 and table[(bot_y + bot_width)//30] [(bot_x + bot_width) //30]!= 0 and bot_y + 20 + bot_speed < 600:                                                          
-                    bot_y  += bot_speed
+                   
+
+                    if valida_obstacle(bot_x , bot_y + bot_width + bot_speed, obstacle_list) and valida_obstacle(bot_x + bot_width, bot_y + bot_width, obstacle_list) :
+                             bot_y  += bot_speed
         loop = False
 
 
@@ -107,7 +123,92 @@ def bot_move(table, bot_x, bot_y, bot_speed, bot_width):
 
 
     return [bot_x, bot_y]
+#main menu???
 
+def main_menu():
+
+
+
+
+    screen_WIDTH = 600
+    screen_HEIGHT = 600
+    screen = pygame.display.set_mode((screen_WIDTH, screen_HEIGHT))
+
+
+    menu_background = pygame.image.load("menu_background.png")
+    pygame.display.set_caption('Slime SUS')
+  
+
+
+    mainClock = pygame.time.Clock()
+    pygame.init()
+    
+
+
+
+    menu=True
+    while menu:
+
+          
+        screen.blit(menu_background, [0,0])
+        pygame.display.update()
+        mainClock.tick(60)
+        
+        for event in pygame.event.get():
+            
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                menu=False
+                sys.exit()
+                
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    main()
+                if event.key == pygame.K_i:
+                    instruction()
+
+        pygame.display.update()
+
+# Instructions
+def instruction():
+
+    screen_WIDTH = 600
+    screen_HEIGHT = 600
+    screen = pygame.display.set_mode((screen_WIDTH, screen_HEIGHT))
+
+
+    instrucciones_foto = pygame.image.load("instrucciones.png")
+    pygame.display.set_caption('Slime SUS')
+  
+
+
+    mainClock = pygame.time.Clock()
+    pygame.init()
+    
+
+
+
+    si=True
+    while si:
+        screen.blit(instrucciones_foto, [0,0])
+        pygame.display.update()
+        mainClock.tick(60)
+
+  
+
+        for event in pygame.event.get():
+            
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                si=False
+                sys.exit()
+           
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                        si = False
+                if event.key == pygame.K_SPACE:
+                    main()
+        
 
 def main():
     
@@ -125,9 +226,7 @@ def main():
     background = pygame.image.load("background.png")
     pygame.display.set_caption('La Cosa')
 
-    soundtrack = pygame.mixer.Sound("soundtrack.wav") #Music: Lost Woods. Composers: Koji Kondo.
-    soundtrack.play(-1)
-    soundtrack.set_volume(0.2)
+    
 
     # Tablero. 0 paredes, 1 piezas, 2 Camino
     table = [
@@ -154,8 +253,10 @@ def main():
 ]
  
 
-
+ 
     # Jugador
+
+    player_font = pygame.font.Font(None, 30)
 
     player_sprite = pygame.image.load("player.png")
     player_sprite = pygame.transform.scale(player_sprite, (20, 20))
@@ -195,12 +296,21 @@ def main():
     
     road = pygame.image.load("road.png")
     road = pygame.transform.scale(road, (30, 30))
+    
+
+    # Pociones 
+
+    potions_font = pygame.font.Font(None, 30)
+    
 
     potions_sprite = pygame.image.load("pociones.png")
     potions_sprite = pygame.transform.scale(potions_sprite, (18, 18))
 
     potions_dado = random.randint(35, 50)
     potions_list = spawn(table, potions_dado, 1, 2)
+    potions_hit = 0 
+
+    
     
 
 
@@ -217,26 +327,22 @@ def main():
     # La Cosa
     dado = random.randint(0,3)
     
-    if dado == 0:
-        la_cosa = player_rect
-    elif dado == 1:
-        la_cosa = bot_1_rect
-    elif dado == 2:
-        la_cosa = bot_2_rect
-    elif dado == 3:
-        la_cosa = bot_3_rect
     
 
     run = True
     bot_count_move = 0 
 
-    print(potions_list)
+    
+
 
     while  run :
         
         screen.blit(background, [0,0])
 
         clock.tick(60)
+
+
+       
 
 
         # Tablero
@@ -260,6 +366,20 @@ def main():
                 if table[j][i] == 2:
                     
                     screen.blit(road, (i*30, j*30))
+         # La cosa
+
+        if dado == 0:
+            la_cosa = player_rect 
+            player_cosa = player_font.render("Eres la cosa",0 ,(0, 0, 0))
+            screen.blit(player_cosa,(50, 0))
+
+        elif dado == 1:
+            la_cosa = bot_1_rect
+        elif dado == 2:
+            la_cosa = bot_2_rect
+        elif dado == 3:
+            la_cosa = bot_3_rect
+    
 
 
         # Pociones y Obstaculos
@@ -269,13 +389,29 @@ def main():
         for i in range(obstacle_dado):
             
             screen.blit(obstacle_sprite, obstacle_list[i])
+
+        potions_list, potions_hit = valida_potions(player_rect.x, player_rect.y, potions_list, potions_hit)
+
+        potions_list, potions_hit = valida_potions(bot_1_rect.x, bot_1_rect.y, potions_list, potions_hit)
+
+        potions_list, potions_hit = valida_potions(bot_2_rect.x, bot_2_rect.y, potions_list, potions_hit)
+
+        potions_list, potions_hit = valida_potions(bot_3_rect.x, bot_3_rect.y, potions_list, potions_hit)
+
+        
+
+        potions_count = potions_font.render(str(potions_hit),0 ,(0, 0, 0))
+
+        screen.blit(potions_count,(25, 0))
         
         
         # Eventos       
         for event in pygame.event.get():
 
             if event.type == pygame.QUIT:
+                    pygame.quit()
                     run = False
+                    sys.exit()
 
             # ----- Movimiento Jugador
             if event.type == pygame.KEYDOWN:
@@ -310,10 +446,14 @@ def main():
                         #Obstaculos
                         if valida_obstacle(player_rect.x + player_sprite.get_width() + player_speed, player_rect.y , obstacle_list) and valida_obstacle(player_rect.x + player_sprite.get_width(), player_rect.y + player_sprite.get_height(), obstacle_list):
                             player_rect.x += player_speed
+
+                if event.key == pygame.K_r:
+                     run = False
+                            
                 
     
 
-        #! potions_list = valida_potions(player_rect.x, player_rect.y, potions_list)
+       
         
 
 
@@ -324,9 +464,9 @@ def main():
         if bot_count_move == 6:
             bot_count_move = 0
             
-            bot_1_rect.x, bot_1_rect.y  = bot_move(table, bot_1_rect.x, bot_1_rect.y, bot_speed, bot_sprite.get_width())
-            bot_2_rect.x, bot_2_rect.y  = bot_move(table, bot_2_rect.x, bot_2_rect.y, bot_speed, bot_sprite.get_width())
-            bot_3_rect.x, bot_3_rect.y  = bot_move(table, bot_3_rect.x, bot_3_rect.y, bot_speed, bot_sprite.get_width())
+            bot_1_rect.x, bot_1_rect.y  = bot_move(table, bot_1_rect.x, bot_1_rect.y, bot_speed, bot_sprite.get_width(),obstacle_list)
+            bot_2_rect.x, bot_2_rect.y  = bot_move(table, bot_2_rect.x, bot_2_rect.y, bot_speed, bot_sprite.get_width(),obstacle_list)
+            bot_3_rect.x, bot_3_rect.y  = bot_move(table, bot_3_rect.x, bot_3_rect.y, bot_speed, bot_sprite.get_width(),obstacle_list)
         
        
         # Pantalla
@@ -341,8 +481,15 @@ def main():
 
             
         pygame.display.flip()
-    sys.exit()
+pygame.init()
+soundtrack = pygame.mixer.Sound("soundtrack.wav") 
+soundtrack.play(-1)
+soundtrack.set_volume(0.2)
+
+main_menu()
 
 
-
-main()
+# Referencias:
+# El slime azul de la pantalla de instrucciones, derrota y victoria es de el anime Tensei "Shitara Slime Datta Ken"
+# La imagen de la portada es la del juego "Slime Rancher"
+# La musica es: Lost Woods. Composers: Koji Kondo. Del juego "The legend of Zelda: Ocarina of time"
