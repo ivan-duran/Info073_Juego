@@ -3,7 +3,6 @@
 #Ariana Gómez 26.529.225-9
 #Eduardo Barrera 21.229.402-0
 #José Cáceres 21.205.805-K
-#a
 
 
 import pygame, sys, random
@@ -54,6 +53,19 @@ def spawn(table, dado, pos1, pos2):
                                     count += 1
     return(list)
     
+# Pociones sobre piedras
+def potions_obstacles(potions_list, obstacles_list):
+    
+    for i in (obstacles_list):
+        for j in (potions_list):
+            if (i ==j):
+                return(True)
+    return(False)
+            
+
+
+
+
 
 # Aparicion Jugador y Computadoras
 def bot_spawn(table):
@@ -73,6 +85,22 @@ def bot_spawn(table):
                                 count += 1
 
     return[bot_x, bot_y]
+
+# Validacion bots sobre roca
+def bots_rocas(obstacles_list, bot_x, bot_y):
+
+    for i in (obstacles_list):
+        if (i[0]==bot_x or i[1]== bot_y):
+            return(True)
+    return(False)
+
+# Cosa matar
+def cosa_killer(cosa_x, cosa_y, bot_x, bot_y, la_cosa_contador):
+    if cosa_x//30 == bot_x//30 and cosa_y//30 == bot_y//30:
+            la_cosa_contador += 1
+            bot_x = -100
+            bot_y = -100
+    return(bot_x, bot_y, la_cosa_contador)
 
 
 # Movimiento de las computadoras
@@ -122,6 +150,14 @@ def bot_move(table, bot_x, bot_y, bot_speed, bot_width, obstacle_list):
 
 
     return [bot_x, bot_y]
+
+
+
+            
+            
+            
+
+
 
 
 #Main Menu
@@ -223,6 +259,8 @@ def main():
     screen = pygame.display.set_mode((screen_WIDTH, screen_HEIGHT))
 
     background = pygame.image.load("background.png")
+    win_background = pygame.image.load("win_background.png")
+    lose_background = pygame.image.load("lose_background.png")
     
 
     
@@ -311,12 +349,30 @@ def main():
     obstacle_dado = random.randint(10, 15)
     obstacle_list = spawn(table, obstacle_dado, 1, 1)
     
+    # ------ Validaciones sobre rocas -------
+    while potions_obstacles(potions_list, obstacle_list):
+        potions_list = spawn(table, potions_dado, 1, 2)
+
+    while bots_rocas(obstacle_list, bot_1_rect.x, bot_1_rect.y):
+        bot_1_rect.x, bot_1_rect.y  = bot_spawn(table)
+
+    while bots_rocas(obstacle_list, bot_2_rect.x, bot_2_rect.y):
+        bot_2_rect.x, bot_2_rect.y  = bot_spawn(table)
+
+    while bots_rocas(obstacle_list, bot_3_rect.x, bot_3_rect.y):
+        bot_3_rect.x, bot_3_rect.y  = bot_spawn(table)
+
+    while bots_rocas(obstacle_list, player_rect.x, player_rect.y):
+        player_rect.x, player_rect.y  = bot_spawn(table)
+
 
     # La Cosa
     la_cosa_dado= random.randint(0,3)
+    muerte_font = pygame.font.Font(None, 30)
     
     run = True
     bot_count_move = 0 
+    la_cosa_contador = 0
 
     while  run :
         
@@ -354,12 +410,37 @@ def main():
 
         if la_cosa_dado == 0:
             player_text = player_font.render("Eres la cosa",0 ,(0, 0, 0))
-            screen.blit(player_text,(70, 0))
+            screen.blit(player_text,(80, 0))
+            bot_1_rect.x, bot_1_rect.y, la_cosa_contador = cosa_killer(player_rect.x, player_rect.y, bot_1_rect.x, bot_1_rect.y, la_cosa_contador)
+            bot_2_rect.x, bot_2_rect.y, la_cosa_contador = cosa_killer(player_rect.x, player_rect.y, bot_2_rect.x, bot_2_rect.y, la_cosa_contador)
+            bot_3_rect.x, bot_3_rect.y, la_cosa_contador = cosa_killer(player_rect.x, player_rect.y, bot_3_rect.x, bot_3_rect.y, la_cosa_contador) 
+            
+
+        
+        elif la_cosa_dado == 1:
+            player_rect.x, player_rect.y, la_cosa_contador = cosa_killer(bot_1_rect.x, bot_1_rect.y, player_rect.x, player_rect.y, la_cosa_contador)
+            
+            bot_2_rect.x, bot_2_rect.y, la_cosa_contador = cosa_killer(bot_1_rect.x, bot_1_rect.y, bot_2_rect.x, bot_2_rect.y, la_cosa_contador)
+            bot_3_rect.x, bot_3_rect.y, la_cosa_contador = cosa_killer(bot_1_rect.x, bot_1_rect.y, bot_3_rect.x, bot_3_rect.y, la_cosa_contador)
+        elif la_cosa_dado == 2:
+            player_rect.x, player_rect.y, la_cosa_contador = cosa_killer(bot_2_rect.x, bot_2_rect.y, player_rect.x, player_rect.y, la_cosa_contador)
+
+            bot_1_rect.x, bot_1_rect.y, la_cosa_contador = cosa_killer(bot_2_rect.x, bot_2_rect.y, bot_1_rect.x, bot_1_rect.y, la_cosa_contador)
+            bot_3_rect.x, bot_3_rect.y, la_cosa_contador = cosa_killer(bot_2_rect.x, bot_2_rect.y, bot_3_rect.x, bot_3_rect.y, la_cosa_contador)
+        elif la_cosa_dado == 3:
+            player_rect.x, player_rect.y, la_cosa_contador = cosa_killer(bot_3_rect.x, bot_3_rect.y, player_rect.x, player_rect.y, la_cosa_contador)
+
+            bot_1_rect.x, bot_1_rect.y, la_cosa_contador = cosa_killer(bot_3_rect.x, bot_3_rect.y, bot_1_rect.x, bot_1_rect.y, la_cosa_contador)
+            bot_2_rect.x, bot_2_rect.y, la_cosa_contador = cosa_killer(bot_3_rect.x, bot_3_rect.y, bot_2_rect.x, bot_2_rect.y, la_cosa_contador)
+
+        
+
+            
+
 
 
         # Pociones y Obstaculos
         for i in range(potions_dado):
-            
             screen.blit(potions_sprite, potions_list[i])
         for i in range(obstacle_dado):
             
@@ -419,8 +500,13 @@ def main():
                         if valida_obstacle(player_rect.x + player_sprite.get_width() + player_speed, player_rect.y , obstacle_list) and valida_obstacle(player_rect.x + player_sprite.get_width(), player_rect.y + player_sprite.get_height(), obstacle_list):
                             player_rect.x += player_speed
 
-                if event.key == pygame.K_r:
-                     run = False
+                if event.key == pygame.K_r :
+                        run = False
+                
+                    
+
+              
+                    
                             
                 
     
@@ -447,6 +533,30 @@ def main():
         screen.blit(bot_sprite, bot_1_rect)
         screen.blit(bot_sprite, bot_2_rect)
         screen.blit(bot_sprite, bot_3_rect)
+        if player_rect.x<0:
+            pygame.draw.rect(screen, (105,214,116), (100,0,470,20))
+            muerte_text = muerte_font.render("Te mataron, presiona [r] para empezar de nuevo",0 ,(0, 0, 0))
+            screen.blit(muerte_text,(100, 0))
+
+       
+        if la_cosa_dado == 0:
+            if la_cosa_contador == 3:
+                #el jugador como cosa gana
+                screen.blit(win_background, [0,0])
+            if potions_dado == potions_hit:
+                #el jugador como cosa pierde
+                screen.blit(lose_background, [0,0])
+        else:
+            if potions_dado == potions_hit:
+                #jugador gana 
+                screen.blit(win_background, [0,0])
+            if la_cosa_contador== 3:
+                screen.blit(lose_background, [0,0])
+            
+            
+            
+
+        
         
         
         
@@ -464,6 +574,6 @@ main_menu()
 
 
 # Referencias:
-# El slime azul de la pantalla de instrucciones, derrota y victoria es de el anime Tensei "Shitara Slime Datta Ken"
+# El slime azul de la pantalla de instrucciones, derrota y victoria es de el anime  "Tensei Shitara Slime Datta Ken"
 # La imagen de la portada es la del juego "Slime Rancher"
 # La musica es: Lost Woods. Composers: Koji Kondo. Del juego "The legend of Zelda: Ocarina of time"
