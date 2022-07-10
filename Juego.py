@@ -122,6 +122,7 @@ def bot_move(table, bot_x, bot_y, bot_speed, bot_width, obstacle_list):
 
     return [bot_x, bot_y]
 
+
 #Main Menu
 def main_menu():
 
@@ -165,6 +166,7 @@ def main_menu():
 
         pygame.display.update()
 
+
 # Instrucciones
 def instruction():
 
@@ -205,7 +207,7 @@ def instruction():
                 if event.key == pygame.K_SPACE:
                     main()
         
-
+# Juego en pantalla
 def main():
     
     
@@ -220,11 +222,11 @@ def main():
     screen = pygame.display.set_mode((screen_WIDTH, screen_HEIGHT))
 
     background = pygame.image.load("background.png")
-    pygame.display.set_caption('La Cosa')
+    
 
     
 
-    # Tablero. 0 paredes, 1 piezas, 2 Camino
+    # Tablero: 0 paredes, 1 piezas, 2 Camino
     table = [
 [0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0],
 [0,0,2,2,2,2,2,2,0,0,0,1,1,1,1,1,1,1,0,0],
@@ -271,24 +273,20 @@ def main():
     bot_3_rect = bot_sprite.get_rect()
     
 
-    bot_1_rect.x, bot_1_rect.y  = bot_spawn(table) 
-    
+    bot_1_rect.x, bot_1_rect.y  = bot_spawn(table)
     bot_2_rect.x, bot_2_rect.y = bot_spawn(table)
-    
     bot_3_rect.x, bot_3_rect.y  = bot_spawn(table)
 
     bot_speed = 10
 
 
-    # Tablero y obstaculos
+    # Paredes - Piezas - Camino
 
     tree = pygame.image.load("Arbol.png")
     tree = pygame.transform.scale(tree, (30, 30))
-    
 
     room = pygame.image.load("flowers.png")
     room = pygame.transform.scale(room, (30, 30))
-
     
     road = pygame.image.load("road.png")
     road = pygame.transform.scale(road, (30, 30))
@@ -296,8 +294,7 @@ def main():
 
     # Pociones 
 
-    potions_font = pygame.font.Font(None, 30)
-    
+    potions_font = pygame.font.Font(None, 30) 
 
     potions_sprite = pygame.image.load("pociones.png")
     potions_sprite = pygame.transform.scale(potions_sprite, (18, 18))
@@ -306,30 +303,19 @@ def main():
     potions_list = spawn(table, potions_dado, 1, 2)
     potions_hit = 0 
 
-    
-    
-
-
+    # Obstaculos
     obstacle_sprite = pygame.image.load("obstaculo.png")
     obstacle_sprite = pygame.transform.scale(obstacle_sprite, (25, 25))
 
     obstacle_dado = random.randint(10, 15)
     obstacle_list = spawn(table, obstacle_dado, 1, 1)
     
-    
-                    
-
 
     # La Cosa
-    dado = random.randint(0,3)
+    la_cosa_dado= random.randint(0,3)
     
-    
-
     run = True
     bot_count_move = 0 
-
-    
-
 
     while  run :
         
@@ -362,20 +348,12 @@ def main():
                 if table[j][i] == 2:
                     
                     screen.blit(road, (i*30, j*30))
-         # La cosa
+        
+        # La cosa
 
-        if dado == 0:
-            la_cosa = player_rect 
+        if la_cosa_dado == 0:
             player_text = player_font.render("Eres la cosa",0 ,(0, 0, 0))
-            screen.blit(player_text,(50, 0))
-
-        elif dado == 1:
-            la_cosa = bot_1_rect
-        elif dado == 2:
-            la_cosa = bot_2_rect
-        elif dado == 3:
-            la_cosa = bot_3_rect
-    
+            screen.blit(player_text,(70, 0))
 
 
         # Pociones y Obstaculos
@@ -387,16 +365,13 @@ def main():
             screen.blit(obstacle_sprite, obstacle_list[i])
 
         potions_list, potions_hit = valida_potions(player_rect.x, player_rect.y, potions_list, potions_hit)
-
         potions_list, potions_hit = valida_potions(bot_1_rect.x, bot_1_rect.y, potions_list, potions_hit)
-
         potions_list, potions_hit = valida_potions(bot_2_rect.x, bot_2_rect.y, potions_list, potions_hit)
-
         potions_list, potions_hit = valida_potions(bot_3_rect.x, bot_3_rect.y, potions_list, potions_hit)
 
+        potions_text = (str(potions_hit) + ("/") + str(potions_dado))
         
-
-        potions_count = potions_font.render(str(potions_hit),0 ,(0, 0, 0))
+        potions_count = potions_font.render(potions_text,0 ,(0, 0, 0))
 
         screen.blit(potions_count,(25, 0))
         
