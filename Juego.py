@@ -4,11 +4,10 @@
 #Eduardo Barrera 21.229.402-0
 #José Cáceres 21.205.805-K
 
-from turtle import speed
+
 import pygame, sys, random
                 
-# Aparicion Obstaculos y pociones
-
+# Valida Obstaculos
 def valida_potions(x, y, potions_list, potions_hit):
     
     for i in range (len(potions_list)):
@@ -21,11 +20,8 @@ def valida_potions(x, y, potions_list, potions_hit):
             
     return (potions_list, potions_hit)
 
-
-        
-
-     
-
+  
+# Valida Obstaculos
 def valida_obstacle(x, y, obstacle_list):
     validacion=0
     for i in range (len(obstacle_list)):
@@ -39,8 +35,8 @@ def valida_obstacle(x, y, obstacle_list):
     else:
         return(True)
 
-    
 
+# Aparicion Obstaculos y pociones
 def spawn(table, dado, pos1, pos2):
     count = 1
     list = []
@@ -57,6 +53,7 @@ def spawn(table, dado, pos1, pos2):
                                     count += 1
     return(list)
     
+
 # Aparicion Jugador y Computadoras
 def bot_spawn(table):
     
@@ -75,6 +72,7 @@ def bot_spawn(table):
                                 count += 1
 
     return[bot_x, bot_y]
+
 
 # Movimiento de las computadoras
 def bot_move(table, bot_x, bot_y, bot_speed, bot_width, obstacle_list):
@@ -123,11 +121,9 @@ def bot_move(table, bot_x, bot_y, bot_speed, bot_width, obstacle_list):
 
 
     return [bot_x, bot_y]
-#main menu???
 
+#Main Menu
 def main_menu():
-
-
 
 
     screen_WIDTH = 600
@@ -169,7 +165,7 @@ def main_menu():
 
         pygame.display.update()
 
-# Instructions
+# Instrucciones
 def instruction():
 
     screen_WIDTH = 600
@@ -188,7 +184,7 @@ def instruction():
 
 
 
-    si=True
+    si = True
     while si:
         screen.blit(instrucciones_foto, [0,0])
         pygame.display.update()
@@ -481,6 +477,8 @@ def main():
 
             
         pygame.display.flip()
+
+# Soundtrack
 pygame.init()
 soundtrack = pygame.mixer.Sound("soundtrack.wav") 
 soundtrack.play(-1)
